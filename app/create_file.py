@@ -11,16 +11,23 @@ def parse_args() -> tuple:
 
 def create_directory_structure(
         d_index: int | None,
-        f_index: int | None) -> str:
+        f_index: int | None) -> any:
     dir_path = ""
     if d_index is not None:
-        end_index = f_index \
-            if (f_index is not None and f_index > d_index) \
-            else len(sys.argv)
-        list_dir = sys.argv[d_index + 1:end_index]
+        dirs = []
+        i = d_index + 1
 
-        if list_dir:
-            dir_path = os.path.join(*list_dir)
+        while i < len(sys.argv):
+            arg = sys.argv[i]
+            if arg.startswith("-"):
+                break
+            if f_index is not None and i == f_index + 1:
+                break
+            dirs.append(arg)
+            i += 1
+
+        if dirs:
+            dir_path = os.path.join(*dirs)
             os.makedirs(dir_path, exist_ok=True)
     return dir_path
 
@@ -41,8 +48,9 @@ def get_file_content() -> str:
 
 
 def write_to_file(file_path: str, output_text: str) -> None:
+    already_exists = os.path.exists(file_path)
     with open(file_path, "a", encoding="utf-8") as file:
-        if os.path.exists(file_path):
+        if already_exists:
             file.write("\n")
         file.write(output_text)
 
@@ -60,5 +68,4 @@ def main() -> None:
     write_to_file(file_path, output_text)
 
 
-if __name__ == "__main__":
-    main()
+main()
